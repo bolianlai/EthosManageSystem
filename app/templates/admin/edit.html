@@ -1,0 +1,191 @@
+{% extends "admin/base.html" %}
+{% block css %}
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static',filename='plugins/datepicker/datepicker3.css') }}">
+    <link href="{{ url_for('static',filename='vendor/bootstrap/css/bootstrap.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static',filename='vendor/jquery/jquery.js') }}"></script>
+    <script src="{{ url_for('static',filename='plugins/inputmask/inputmask.js') }}"></script>
+    <script src="{{ url_for('static',filename='plugins/inputmask/inputmask.numeric.extensions.js') }}"></script>
+    <style>
+        .btn-primary {
+            color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -ms-touch-action: manipulation;
+            touch-action: manipulation;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('admin.userpage') }}">Ethos后台管理系统</a>
+        </li>
+        <li class="breadcrumb-item active">编辑用户</li>
+    </ol>
+    {% for msg in get_flashed_messages(category_filter=['ok']) %}
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-check"></i> 操作成功！</h4>
+            {{ msg }}
+        </div>
+    {% endfor %}
+    {% for msg in get_flashed_messages(category_filter=['error']) %}
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-ban"></i> 操作失败！</h4>
+            {{ msg }}
+        </div>
+    {% endfor %}
+    {% if id %}
+        <!-- Example DataTables Card-->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fa fa-table"></i> 编辑用户信息
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" role="form">
+                    <div class="form-group">
+                        <label>{{ form.account.label }}</label>
+                        {{ form.account(value=account.username) }}
+                        {% for err in form.account.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ form.pwd.label }}</label>
+                        {{ form.pwd }}
+                        {% for err in form.pwd.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ form.miners.label }}:{{ account.miners }}</label>
+{#                        {{ form.miners(value=account.miners) }}#}
+{#                        {% for err in form.miners.errors %}#}
+{#                            <div class="col-md-12" id="input_user">#}
+{#                                <font style="color:red">{{ err }}</font>#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+                    </div>
+                    <div class="form-group">
+                        <label for="input_release_time">{{ form.registered_on.label }}</label>
+                        {{ form.registered_on(value=account.registered_on) }}
+                        {% for err in form.registered_on.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ form.confirmed.label }}</label>
+                        {{ form.confirmed(value=account.confirmed) }}
+                        {% for err in form.confirmed.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <label for="input_release_time">{{ form.confirmed_on.label }}</label>
+                        {{ form.confirmed_on(value=account.confirmed_on) }}
+                        {% for err in form.confirmed_on.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <label>{{ form.is_vip.label }}</label>
+                        {{ form.is_vip(value=account.is_vip) }}
+                        {% for err in form.is_vip.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        <label for="input_release_time">{{ form.stop_vip.label }}</label>
+                        {{ form.stop_vip(value=account.stop_vip) }}
+                        {% for err in form.stop_vip.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ form.display_num.label }}</label>
+                        {{ form.display_num(value=account.display_num) }}
+                        {% for err in form.display_num.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ form.submit }}
+                    {{ form.csrf_token }}
+                </form>
+            </div>
+            <div class="card-footer small text-muted">It is the</div>
+        </div>
+    {% else %}
+        <button type="button" class="btn btn-primary btn-lg btn-block"
+                onclick='window.location.href="{{ url_for('admin.userpage') }}"'>选择用户编辑
+        </button>
+    {% endif %}
+{% endblock %}
+{% block js %}
+    <script>
+        $(document).ready(function () {
+            $('.input_release_time').datepicker({
+                autoclose: true,
+                format: 'yyyy-mm-dd',
+                language: 'zh-CN',
+            });
+        });
+        document.getElementById('collapseExamplePages').className += ' show';
+        $(document).ready(function () {
+            $('#g-1-3').addClass('active');
+        });
+
+        function cc(s) {
+            if (/[^0-9\.]/.test(s)) return "invalid value";
+            s = s.replace(/^(\d*)$/, "$1.");
+            s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
+            s = s.replace(".", ",");
+            var re = /(\d)(\d{3},)/;
+            while (re.test(s))
+                s = s.replace(re, "$1,$2");
+            s = s.replace(/,(\d\d)$/, ".$1");
+            return "￥" + s.replace(/^\./, "0.")
+        }
+
+    </script>
+{% endblock %}

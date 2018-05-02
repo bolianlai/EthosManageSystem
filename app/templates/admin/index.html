@@ -1,0 +1,173 @@
+{% extends "admin/base.html" %}
+{% block css %}
+{% endblock %}
+<!-- DataTables CSS -->
+<link href="{{ url_for('static',filename='vendor/datatables-plugins/dataTables.bootstrap.css') }}" rel="stylesheet">
+
+<!-- DataTables Responsive CSS -->
+<link href="{{ url_for('static',filename='vendor/datatables-responsive/dataTables.responsive.css') }}" rel="stylesheet">
+
+{% block content %}
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('admin.userpage') }}">Ethos后台管理系统</a>
+        </li>
+        <li class="breadcrumb-item active">用户列表</li>
+    </ol>
+
+    <!-- Example DataTables Card-->
+    <div class="card mb-3">
+        {% for msg in get_flashed_messages(category_filter=['ok']) %}
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4><i class="icon fa fa-check"></i> 操作成功！</h4>
+                {{ msg }}
+            </div>
+        {% endfor %}
+        <div class="card-header">
+            <i class="fa fa-table"></i> 用户列表
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table cellspacing="0" class="table table-bordered" id="dataTable" style="white-space: nowrap;">
+                    <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>标识</th>
+                        <th>注册时间</th>
+                        <th>是否激活</th>
+                        <th>激活时间</th>
+                        <th>是否VIP></th>
+                        <th>VIP到期时间</th>
+                        <th>展示数据条数</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for c in accountlist %}
+                        <tr>
+                            <th>{{ c.username }}</th>
+                            <th>{{ c.miners }}</th>
+                            <th>{{ c.registered_on }}</th>
+                            <th>{{ c.confirmed }}</th>
+                            <th>{{ c.confirmed_on }}</th>
+                            <th>{{ c.is_vip }}</th>
+                            <th>{{ c.stop_vip }}</th>
+                            <th>{{ c.display_num }}</th>
+                            <th>
+                                <button class="btn btn-primary" type="button" onclick='window.location.href="{{ url_for('admin.edit',id=c.id) }}"'>编辑</button>
+                                <button class="btn btn-danger" data-toggle="modal"
+                                        data-target="#exampledelete{{ c.id }}">删除
+                                </button>
+                                <div class="modal fade" id="exampledelete{{ c.id }}" tabindex="-1" role="dialog"
+                                     aria-labelledby="exampleModalLabel"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">你确定要删除{{ c.username }}用户？</h5>
+                                                <button class="close" type="button" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">确定？</div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" type="button" data-dismiss="modal">
+                                                    不了
+                                                </button>
+                                                <a class="btn btn-primary"
+                                                   href="{{ url_for('admin.delete',id=c.id) }}">是的</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script>
+        {#        window.onload = function () {#}
+        {#            var l = new Array();#}
+        {#            {% for c in statuslist %}#}
+        {#                var t1 = "{{ c.updatetime }}";#}
+        {#                var d1 = t1.replace(/\-/g, "/");#}
+        {#                var date1 = new Date(d1);#}
+        {#                var date2 = new Date();#}
+        {#                if ((parseInt(date2 - date1) / 1000 / 60) > 5) {#}
+        {#                    l.push("{{ c.hostname }}");#}
+        {#                }#}
+        {##}
+        {#            {% endfor %}#}
+        {#            if (l) {#}
+        {#                alert("您的矿机" + l.join(',') + "已经掉线");#}
+        {#            }#}
+        {#        };#}
+
+        $(document).ready(function () {
+
+            // Handle click on "Select all" control
+            $('#example-select-all').on('click', function () {
+                // Get all rows with search applied
+                var rows = table.rows({'search': 'applied'}).nodes();
+                // Check/uncheck checkboxes for all rows in the table
+                $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            });
+
+            // Handle click on checkbox to set state of "Select all" control
+            $('#example tbody').on('change', 'input[type="checkbox"]', function () {
+                // If checkbox is not checked
+                if (!this.checked) {
+                    var el = $('#example-select-all').get(0);
+                    // If "Select all" control is checked and has 'indeterminate' property
+                    if (el && el.checked && ('indeterminate' in el)) {
+                        // Set visual state of "Select all" control
+                        // as 'indeterminate'
+                        el.indeterminate = true;
+                    }
+                }
+            });
+
+            // Handle form submission event
+            $('#frm-example').on('submit', function (e) {
+                var form = this;
+
+                // Iterate over all checkboxes in the table
+                table.$('input[type="checkbox"]').each(function () {
+                    // If checkbox doesn't exist in DOM
+                    if (!$.contains(document, this)) {
+                        // If checkbox is checked
+                        if (this.checked) {
+                            // Create a hidden element
+                            $(form).append(
+                                $('<input>')
+                                    .attr('type', 'hidden')
+                                    .attr('name', this.name)
+                                    .val(this.value)
+                            );
+                        }
+                    }
+                });
+            });
+
+        });
+        document.getElementById('collapseExamplePages').className += ' show';
+        $(document).ready(function () {
+            $('#g-1-1').addClass('active');
+        });
+
+        var table = $('#example').DataTable();
+        var columnNo = 1;
+        var myValue = $('.form-control form-control-sm').val();
+        var regExSearch = '^\\s' + myValue + '\\s*$';
+        table.column(columnNo).search(regExSearch, true, false).draw();
+    </script>
+{% endblock %}

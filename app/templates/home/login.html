@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="order by dede58.com"/>
+    <title>Ethos用户登录</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/reset.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/common.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap-movie.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/animate.css') }}">
+</head>
+<body>
+<div class="wrap login_wrap">
+    <div class="content">
+
+        <div class="logo"></div>
+
+        <div class="login_box">
+            <div class="login_form">
+                <div class="login_title">
+                    Ethos用户登录
+                </div>
+                <form role="form" method="POST">
+                    <div class="form_text_ipt">
+                        {{ form.account }}
+                        {% for err in form.account.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="ececk_warning"><span></span></div>
+                    <div class="form_text_ipt">
+                        {{ form.pwd }}
+                        {% for err in form.pwd.errors %}
+                            <div class="col-md-12" id="input_user">
+                                <font style="color:red">{{ err }}</font>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="ececk_warning"><span></span></div>
+                    <div class="form_check_ipt">
+
+                        <div class="right check_right">
+                            <div class="left check_left">
+                                <span>还没有帐号？</span><a href="{{ url_for('home.register') }}">马上注册</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form_btn">
+                        {{ form.submit }}
+                        {{ form.csrf_token }}
+                    </div>
+                </form>
+
+                <div class="other_login">
+                    <div class="left other_left">
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/common.js') }}"></script>
+<script>
+    function getQueryString(name) {
+        var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+        if (result == null || result.length < 1) {
+            return "";
+        }
+        return result[1];
+    }
+        window.onload = function () {
+            var str = getQueryString("error");
+            if (str) {
+                alert(decodeURI(str));
+            }
+        }
+</script>
+</body>
+</html>

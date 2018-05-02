@@ -1,0 +1,189 @@
+{% extends "home/base.html" %}
+{% block css %}
+{% endblock %}
+<!-- DataTables CSS -->
+<link href="{{ url_for('static',filename='vendor/datatables-plugins/dataTables.bootstrap.css') }}" rel="stylesheet">
+
+<!-- DataTables Responsive CSS -->
+<link href="{{ url_for('static',filename='vendor/datatables-responsive/dataTables.responsive.css') }}" rel="stylesheet">
+
+{% block content %}
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('home.userpage',username=username) }}">Ethos管理系统</a>
+        </li>
+        <li class="breadcrumb-item active">矿机列表</li>
+    </ol>
+
+    <!-- Example DataTables Card-->
+    <div class="card mb-3">
+        {% for msg in get_flashed_messages(category_filter=['ok']) %}
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4><i class="icon fa fa-check"></i> 操作成功！</h4>
+                {{ msg }}
+            </div>
+        {% endfor %}
+        <div class="card-header">
+            <i class="fa fa-table"></i> 矿机列表
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table cellspacing="0" class="table table-bordered" id="dataTable" style="white-space: nowrap;">
+                    <thead>
+                    <tr>
+                        <th>矿区</th>
+                        <th>矿机名</th>
+                        <th>IP地址</th>
+                        <th>状态</th>
+                        <th>挖矿核心版本</th>
+                        <th>挖矿工作时间</th>
+                        <th>开机自动挖矿</th>
+                        <th>总算力</th>
+                        <th>显卡算力</th>
+                        <th>风扇转速%</th>
+                        <th>显卡温度</th>
+                        <th>矿池信息及钱包地址</th>
+                        <th>系统版本号</th>
+                        <th>挖矿核心</th>
+                        <th>是否开启远程配置</th>
+                        <th>显卡类型</th>
+                        <th>故障卡数量</th>
+                        <th>总显卡数量</th>
+                        <th>显卡bios号及型号</th>
+                        <th>显卡默认主频</th>
+                        <th>显卡默认显存</th>
+                        <th>显卡实际主频</th>
+                        <th>显卡实际显存</th>
+                        <th>显卡实际电压</th>
+                        <th>显卡实际功耗</th>
+                        <th>显卡功耗设置</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for c in statuslist %}
+                        <tr>
+                            <th>{{ c.rack_loc }}</th>
+                            <th>{{ c.hostname }}</th>
+                            <th>{{ c.ip }}</th>
+                            {% if not is_expired(c.updatetime) %}
+                                <th style="background-color: red;">掉线</th>
+                            {% else %}
+                                <th>{{ c.status }}</th>
+                            {% endif %}
+                            <th>{{ c.miner_version }}</th>
+                            <th>{{ timestran(c.miner_secs) }}</th>
+                            <th>
+                                {% if c.allowed=='1' %}
+                                    是
+                                {% else %}
+                                    否
+                                {% endif %}
+                            </th>
+                            <th>{{ c.hash }}</th>
+                            <th>{{ c.miner_hashes }}</th>
+                            <th>{{ c.fanpercent }}</th>
+                            <th>{{ c.temp }}</th>
+                            <th>{{ c.poorl_info }}</th>
+                            <th>{{ c.version }}</th>
+                            <th>{{ c.miner }}</th>
+                            <th>{{ c.send_remote }}</th>
+                            <th>{{ c.driver }}</th>
+                            <th>{{ c.crashed_gpus }}</th>
+                            <th>{{ c.gpus }}</th>
+                            <th>{{ c.models }}</th>
+                            <th>{{ c.default_core }}</th>
+                            <th>{{ c.default_mem }}</th>
+                            <th>{{ c.core }}</th>
+                            <th>{{ c.mem }}</th>
+                            <th>{{ c.voltage }}</th>
+                            <th>{{ c.watts }}</th>
+                            <th>{{ c.powertune }}</th>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script>
+        window.onload = function () {
+            var l = new Array();
+            {% for c in statuslist %}
+                var t1 = "{{ c.updatetime }}";
+                var d1 = t1.replace(/\-/g, "/");
+                var date1 = new Date(d1);
+                var date2 = new Date();
+                if ((parseInt(date2 - date1) / 1000 / 60) > 5) {
+                    l.push("{{ c.hostname }}");
+                }
+
+            {% endfor %}
+            if (l) {
+                alert("您的矿机" + l.join(',') + "已经掉线");
+            }
+        };
+
+        $(document).ready(function () {
+
+            // Handle click on "Select all" control
+            $('#example-select-all').on('click', function () {
+                // Get all rows with search applied
+                var rows = table.rows({'search': 'applied'}).nodes();
+                // Check/uncheck checkboxes for all rows in the table
+                $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            });
+
+            // Handle click on checkbox to set state of "Select all" control
+            $('#example tbody').on('change', 'input[type="checkbox"]', function () {
+                // If checkbox is not checked
+                if (!this.checked) {
+                    var el = $('#example-select-all').get(0);
+                    // If "Select all" control is checked and has 'indeterminate' property
+                    if (el && el.checked && ('indeterminate' in el)) {
+                        // Set visual state of "Select all" control
+                        // as 'indeterminate'
+                        el.indeterminate = true;
+                    }
+                }
+            });
+
+            // Handle form submission event
+            $('#frm-example').on('submit', function (e) {
+                var form = this;
+
+                // Iterate over all checkboxes in the table
+                table.$('input[type="checkbox"]').each(function () {
+                    // If checkbox doesn't exist in DOM
+                    if (!$.contains(document, this)) {
+                        // If checkbox is checked
+                        if (this.checked) {
+                            // Create a hidden element
+                            $(form).append(
+                                $('<input>')
+                                    .attr('type', 'hidden')
+                                    .attr('name', this.name)
+                                    .val(this.value)
+                            );
+                        }
+                    }
+                });
+            });
+
+        });
+        document.getElementById('collapseExamplePages').className += ' show';
+        $(document).ready(function () {
+            $('#g-1-1').addClass('active');
+        });
+
+        var table = $('#example').DataTable();
+        var columnNo = 1;
+        var myValue = $('.form-control form-control-sm').val();
+        var regExSearch = '^\\s' + myValue + '\\s*$';
+        table.column(columnNo).search(regExSearch, true, false).draw();
+    </script>
+{% endblock %}
